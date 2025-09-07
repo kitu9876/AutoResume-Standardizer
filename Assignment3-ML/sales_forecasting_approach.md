@@ -23,7 +23,7 @@ Since plant-level accuracy is expected to be at least **80%**, that becomes the 
 ---
 
 ## 3. Exploratory Data Analysis (EDA)
-- Plotted total sales over time to check for **trends and seasonal patterns**.  
+- Plot total sales over time to check for **trends and seasonal patterns**.  
 - Compared plant-level vs customer-level behavior:  
   - Some customers show steady demand, others are irregular.  
 - Identified **spikes and anomalies**, possibly due to promotions, fiscal cycles, or special events.  
@@ -33,18 +33,35 @@ Since plant-level accuracy is expected to be at least **80%**, that becomes the 
 
 ## 4. Feature Engineering
 Created features to make the data useful for machine learning models:
+As if we use the models like GBM(Gradient-Boost),XG Boost, Random Forest, they can't see the future directly like ARIMA does.
+So, we need to teach them patterns from the past by creating features that describes the time series.
 
 - **Calendar features**: month, quarter, year  
 - **Lag features**: sales from the last 1, 3, 6, and 12 months  
 - **Rolling features**: moving averages and standard deviations over the past 3 and 6 months  
 - **Group features**: plant ID, customer ID, and product line  
 
-These features help the model learn seasonality, recent momentum, and differences across plants/customers.  
+Thus, these features will help the model learn seasonality, recent momentum, and differences across plants/customers.  
 
 ---
 
 ## 5. Baseline Models
-Before applying ML, I built simple baselines to measure improvement:
+Before applying ML, simple baselines can be built to measure improvement:
+
+Type: Simple heuristic / baseline method
+Concept:
+1. The simplest possible forecast.
+2. Assumes that the next month’s sales will be exactly the same as the previous month.
+
+Idea: Predict the next value as exactly the same as the last observed value.
+
+Formula:  𝑦^t+1=y^t
+	​
+Characteristics:
+
+1. No training, no parameters, no learning from data.
+2. Extremely simple, only works “as-is” from the observed series.
+3. Serves as a benchmark for other models.
 
 - **Naïve forecast**: next month = last month  
 - **Seasonal naïve**: next January = last January  
@@ -54,15 +71,15 @@ These baselines provided a benchmark. Any ML model must perform better than thes
 ---
 
 ## 6. Modeling Strategy
-- Main forecasting was done using **gradient boosting models (LightGBM/XGBoost)**.  
-- A **global model** was trained across all plants and customers, with Plant/Customer IDs included as features.  
+- Main forecasting can be done using **gradient boosting models (LightGBM/XGBoost)**.  
+- A **global model** can be trained across all plants and customers, with Plant/Customer IDs included as features.  
   - This allowed the model to learn both general seasonal patterns and group-specific behaviors.  
-- For very large customers with consistent history, **per-customer models** were also tested.  
+- For very large customers with consistent history, **per-customer models** can also be tested.  
 
 ---
 
 ## 7. Validation
-- Used **time-series cross-validation** with rolling windows (train on earlier months, test on the following months).  
+- Should be used the **time-series cross-validation** with rolling windows (train on earlier months, test on the following months).  
 - Metrics used:  
   - **MAPE (Mean Absolute Percentage Error)** → intuitive percentage-based metric  
   - **RMSE (Root Mean Squared Error)** → penalizes large deviations  
@@ -82,9 +99,9 @@ These baselines provided a benchmark. Any ML model must perform better than thes
 ---
 
 ## 9. Evaluation and Results
-- **Plant level**: forecasts achieved close to the expected accuracy threshold (~80%).  
-- **Customer level**: forecasts were less stable due to irregular orders but still outperformed naïve baselines.  
-- Visual comparisons (actual vs predicted) showed that the model captured **seasonality and recent trends** fairly well.  
+- **Plant level**: forecasts can be achieved close to the expected accuracy threshold (~80%).  
+- **Customer level**: forecasts can be less stable due to irregular orders but still it should  outperformed naïve baselines.  
+- Visual comparisons (actual vs predicted) scan be shown that the model captured **seasonality and recent trends** fairly well.  
 
 ---
 
@@ -106,4 +123,4 @@ The overall approach was:
 6. Forecast iteratively for 12 months  
 7. Aggregate results and evaluate accuracy  
 
-This step-by-step method provided a robust pipeline that works at both the **customer level** and the **plant level**, with plant-level results meeting the expected accuracy.  
+This step-by-step method provides a robust pipeline that works at both the **customer level** and the **plant level**, with plant-level results meeting the expected accuracy.  
